@@ -41,6 +41,13 @@ const voterSchema = mongoose.Schema({
         required: true,
         unique: true
     },
+    role: {
+        type: String,
+        default: "Voter"
+    }, isVoted: {
+        type: Boolean,
+        default: false
+    }
 });
 
 module.exports = mongoose.model("candidate", voterSchema);
