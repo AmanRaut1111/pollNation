@@ -80,7 +80,7 @@ const loginVoter = async (req, res) => {
                     res
                         .status(400)
                         .json({
-                            message: "Password does Not match..!",
+                            message: "Password Does Not Match. Try Again..!",
                             status: false,
                             statusCode: 400,
                         });
@@ -113,5 +113,38 @@ const loginVoter = async (req, res) => {
             });
     }
 };
+const updateVoterProfile = async (req, res) => {
+    const { id } = req.params
+    try {
+        const voterData = await voterModel.findByIdAndUpdate(id, { $set: req.body }, { new: true })
+        if (voterData) {
+            res.status(200).json({ message: "Voter profile Updated sucessfully...!", status: true, statusCode: 200, data: voterData })
+        } else {
+            res.status(400).json({ message: "Something went wrong...!", status: false, statusCode: 400 })
+        }
 
-module.exports = { registerVoter, loginVoter };
+    } catch (error) {
+        console.log(error);
+        res.status(500).json({ message: "Something went wrong...!", status: false, statusCode: 500 })
+
+
+    }
+}
+
+const updateVoterPassword = async (req, res) => {
+    const { id } = req.params
+    const { password } = req.body
+    try {
+        const hashPassword = await bcrypt.hash(password, 10)
+        const updatePassword = await voterModel.findByIdAndUpdate(id, { $set: { password: hashPassword } })
+        if (updatePassword) {
+            res.status(200).json({ message: "Password updated sucessfully..!", status: true, statusCode: 200 })
+        } else {
+            res.status(400).json({ message: "Something went wrong...!", status: false, statusCode: 400 })
+        }
+    } catch (error) {
+        res.status(500).json({ message: "Something went wrong...!", status: false, statusCode: 500 })
+        console.log(error);
+    }
+}
+module.exports = { registerVoter, loginVoter, updateVoterProfile, updateVoterPassword };
