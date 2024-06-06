@@ -116,7 +116,7 @@ const loginVoter = async (req, res) => {
 const updateVoterProfile = async (req, res) => {
     const { id } = req.params
     try {
-        const voterData = await voterModel.findByIdAndUpdate(id, { $set: req.body }, { new: true })
+        const voterData = await voterModel.findByIdAndUpdate(id, { $set: req.body, updatedAt: new Date() }, { new: true })
         if (voterData) {
             res.status(200).json({ message: "Voter profile Updated sucessfully...!", status: true, statusCode: 200, data: voterData })
         } else {
@@ -147,4 +147,35 @@ const updateVoterPassword = async (req, res) => {
         console.log(error);
     }
 }
-module.exports = { registerVoter, loginVoter, updateVoterProfile, updateVoterPassword };
+const getVoterDetails = async (req, res) => {
+    try {
+
+        const votersData = await voterModel.aggregate([
+            {
+                $project: {
+                    voterName: 1,
+                    gender: 1,
+                    age: 1,
+                    state: 1,
+                    constituency: 1,
+                    mobileNo: 1,
+                    isVoted: 1,
+                    createdAt: 1,
+                    updatedAt: 1
+                }
+            }
+        ])
+        if (votersData) {
+            res.status(200).json({ message: "Data Found Sucessfully..!", status: true, statusCode: 200, data: votersData })
+        } else {
+            res.status(400).json({ message: "Something went wrong...!", status: false, statusCode: 400 })
+        }
+
+    } catch (error) {
+        console.log(error);
+        res.status(500).json({ message: "Something went wrong...!", status: false, statusCode: 500 })
+    }
+}
+
+
+module.exports = { registerVoter, loginVoter, updateVoterProfile, updateVoterPassword, getVoterDetails };
