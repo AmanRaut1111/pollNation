@@ -58,4 +58,4 @@ const voterSchema = mongoose.Schema({
     },
 });
 
-module.exports = mongoose.model("candidate", voterSchema);
+module.exports = mongoose.model("voter", voterSchema);
