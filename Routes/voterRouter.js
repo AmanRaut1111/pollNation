@@ -3,7 +3,7 @@ const { registerVoter, loginVoter, updateVoterProfile, updateVoterPassword, getV
 
 const voterRouter = express.Router();
 
-voterRouter.post("/registerCandidate", registerVoter);
+voterRouter.post("/registerVoter", registerVoter);
 voterRouter.post("/login", loginVoter);
 voterRouter.put('/update/:id', updateVoterProfile)
 voterRouter.patch('/updatePassword/:id', updateVoterPassword)
