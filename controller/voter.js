@@ -208,34 +208,41 @@ const getVoterDetails = async (req, res) => {
 const giveVote = async (req, res) => {
     try {
         const { id } = req.params;
-        const { votes } = req.body;
+        const { votes, voterId } = req.body;
+
+        const checkIsVoted = await voterModel.findById(voterId);
+
+        if (checkIsVoted.isVoted)
+            return res
+                .status(404)
+                .json({ message: "You have voted", status: false, statsuCode: 404 });
 
         const voteObjects = votes.map((vote) => ({
             voterId: new mongoose.Types.ObjectId(vote.voterId),
             voteAt: new Date(),
         }));
 
-        const candidate = await candidateModel.findById(id);
+        // const candidate = await candidateModel.findById(id);
 
-        if (candidate) {
-            const check = candidate.votes
-                .toString()
-                .includes(voteObjects[0].voterId.toString());
+        // if (candidate) {
+        //     const check = candidate.votes
+        //         .toString()
+        //         .includes(voteObjects[0].voterId.toString());
 
-            if (check) {
-                return res.status(400).json({
-                    message: "You are already Voted...!",
-                    statusCode: 400,
-                    statsu: false,
-                });
-            }
-        } else {
-            return res.status(404).json({
-                message: "Cadidate is not found...!",
-                status: false,
-                statsuCode: 404,
-            });
-        }
+        //     if (check) {
+        //         return res.status(400).json({
+        //             message: "You are already Voted...!",
+        //             statusCode: 400,
+        //             statsu: false,
+        //         });
+        //     }
+        // } else {
+        //     return res.status(404).json({
+        //         message: "Cadidate is not found...!",
+        //         status: false,
+        //         statsuCode: 404,
+        //     });
+        // }
 
         const updatedCandidate = await candidateModel.findByIdAndUpdate(
             id,
@@ -247,16 +254,29 @@ const giveVote = async (req, res) => {
             { new: true }
         );
 
-
         if (updatedCandidate) {
-            res.status(200).json({ message: "Votye added Sucessfully...!", staus: true, statsuCode: 200, data: updatedCandidate })
+            const checkIVoted = await voterModel.findByIdAndUpdate(voterId, {
+                $set: { isVoted: true },
+            });
+
+            console.log(checkIVoted);
+            res
+                .status(200)
+                .json({
+                    message: "Vote added Sucessfully...!",
+                    staus: true,
+                    statsuCode: 200,
+                    data: updatedCandidate,
+                });
         } else {
-            res.status(400).json({ message: "Something went wrong...! ", status: false, statsuCode: 400 })
+            res
+                .status(400)
+                .json({
+                    message: "Something went wrong...! ",
+                    status: false,
+                    statsuCode: 400,
+                });
         }
-
-
-
-
     } catch (error) {
         console.error("Error adding vote:", error);
         res.status(500).json({
