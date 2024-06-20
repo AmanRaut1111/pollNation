@@ -247,21 +247,16 @@ const giveVote = async (req, res) => {
             { new: true }
         );
 
-        if (!updatedCandidate) {
-            return res.status(404).json({
-                message: "Candidate not found",
-                status: false,
-                statusCode: 404,
-            });
+
+        if (updatedCandidate) {
+            res.status(200).json({ message: "Votye added Sucessfully...!", staus: true, statsuCode: 200, data: updatedCandidate })
+        } else {
+            res.status(400).json({ message: "Something went wrong...! ", status: false, statsuCode: 400 })
         }
 
-        // Send success response
-        res.status(200).json({
-            message: "Vote Added Successfully",
-            status: true,
-            statusCode: 200,
-            data: updatedCandidate,
-        });
+
+
+
     } catch (error) {
         console.error("Error adding vote:", error);
         res.status(500).json({
