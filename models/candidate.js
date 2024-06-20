@@ -27,22 +27,20 @@ const candidateschema = mongoose.Schema({
     },
     votes: [{
 
-        _id: {
+        voterId: {
             type: mongoose.Schema.Types.ObjectId,
-            default: ""
 
+
+            required: true,
         },
-
-
         voteAt: {
             type: Date,
-            default: new Date(),
+            default: Date.now(),
         },
-    },
-    ],
+    }],
 
     totalVotes: {
-        type: String,
+        type: Number,
         default: 0,
     },
     createdAt: {
