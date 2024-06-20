@@ -1,6 +1,10 @@
+const candidate = require("../models/candidate");
 const voterModel = require("../models/voter");
+const candidateModel = require("../models/candidate");
 
 const bcrypt = require("bcrypt");
+const { default: mongoose, Mongoose } = require("mongoose");
+
 const registerVoter = async (req, res) => {
     try {
         const {
@@ -98,8 +102,6 @@ const loginVoter = async (req, res) => {
     }
 };
 const updateVoterProfile = async (req, res) => {
-
-
     try {
         const { id } = req.params;
 
@@ -109,32 +111,26 @@ const updateVoterProfile = async (req, res) => {
             { new: true }
         );
         if (voterData) {
-            res
-                .status(200)
-                .json({
-                    message: "Voter profile Updated sucessfully...!",
-                    status: true,
-                    statusCode: 200,
-                    data: voterData,
-                });
+            res.status(200).json({
+                message: "Voter profile Updated sucessfully...!",
+                status: true,
+                statusCode: 200,
+                data: voterData,
+            });
         } else {
-            res
-                .status(400)
-                .json({
-                    message: "Something went wrong...!",
-                    status: false,
-                    statusCode: 400,
-                });
+            res.status(400).json({
+                message: "Something went wrong...!",
+                status: false,
+                statusCode: 400,
+            });
         }
     } catch (error) {
         console.log(error);
-        res
-            .status(500)
-            .json({
-                message: "Something went wrong...!",
-                status: false,
-                statusCode: 500,
-            });
+        res.status(500).json({
+            message: "Something went wrong...!",
+            status: false,
+            statusCode: 500,
+        });
     }
 };
 
@@ -147,30 +143,24 @@ const updateVoterPassword = async (req, res) => {
             $set: { password: hashPassword },
         });
         if (updatePassword) {
-            res
-                .status(200)
-                .json({
-                    message: "Password updated sucessfully..!",
-                    status: true,
-                    statusCode: 200,
-                });
+            res.status(200).json({
+                message: "Password updated sucessfully..!",
+                status: true,
+                statusCode: 200,
+            });
         } else {
-            res
-                .status(400)
-                .json({
-                    message: "Something went wrong...!",
-                    status: false,
-                    statusCode: 400,
-                });
-        }
-    } catch (error) {
-        res
-            .status(500)
-            .json({
+            res.status(400).json({
                 message: "Something went wrong...!",
                 status: false,
-                statusCode: 500,
+                statusCode: 400,
             });
+        }
+    } catch (error) {
+        res.status(500).json({
+            message: "Something went wrong...!",
+            status: false,
+            statusCode: 500,
+        });
         console.log(error);
     }
 };
@@ -192,32 +182,93 @@ const getVoterDetails = async (req, res) => {
             },
         ]);
         if (votersData) {
-            res
-                .status(200)
-                .json({
-                    message: "Data Found Sucessfully..!",
-                    status: true,
-                    statusCode: 200,
-                    data: votersData,
-                });
+            res.status(200).json({
+                message: "Data Found Sucessfully..!",
+                status: true,
+                statusCode: 200,
+                data: votersData,
+            });
         } else {
-            res
-                .status(400)
-                .json({
-                    message: "Something went wrong...!",
-                    status: false,
-                    statusCode: 400,
-                });
+            res.status(400).json({
+                message: "Something went wrong...!",
+                status: false,
+                statusCode: 400,
+            });
         }
     } catch (error) {
         console.log(error);
-        res
-            .status(500)
-            .json({
-                message: "Something went wrong...!",
+        res.status(500).json({
+            message: "Something went wrong...!",
+            status: false,
+            statusCode: 500,
+        });
+    }
+};
+
+const giveVote = async (req, res) => {
+    try {
+        const { id } = req.params;
+        const { votes } = req.body;
+
+        const voteObjects = votes.map((vote) => ({
+            voterId: new mongoose.Types.ObjectId(vote.voterId),
+            voteAt: new Date(),
+        }));
+
+        const candidate = await candidateModel.findById(id);
+
+        if (candidate) {
+            const check = candidate.votes
+                .toString()
+                .includes(voteObjects[0].voterId.toString());
+
+            if (check) {
+                return res.status(400).json({
+                    message: "You are already Voted...!",
+                    statusCode: 400,
+                    statsu: false,
+                });
+            }
+        } else {
+            return res.status(404).json({
+                message: "Cadidate is not found...!",
                 status: false,
-                statusCode: 500,
+                statsuCode: 404,
             });
+        }
+
+        const updatedCandidate = await candidateModel.findByIdAndUpdate(
+            id,
+            {
+                $push: { votes: voteObjects },
+                $inc: { totalVotes: voteObjects.length },
+            },
+
+            { new: true }
+        );
+
+        if (!updatedCandidate) {
+            return res.status(404).json({
+                message: "Candidate not found",
+                status: false,
+                statusCode: 404,
+            });
+        }
+
+        // Send success response
+        res.status(200).json({
+            message: "Vote Added Successfully",
+            status: true,
+            statusCode: 200,
+            data: updatedCandidate,
+        });
+    } catch (error) {
+        console.error("Error adding vote:", error);
+        res.status(500).json({
+            message: "Something went wrong",
+            status: false,
+            statusCode: 500,
+        });
     }
 };
 
@@ -227,4 +278,5 @@ module.exports = {
     updateVoterProfile,
     updateVoterPassword,
     getVoterDetails,
+    giveVote,
 };
