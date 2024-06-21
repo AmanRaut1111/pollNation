@@ -32,7 +32,7 @@ const registerVoter = async (req, res) => {
             mobileNo: mobileNo,
         });
 
-        const token = jwt.sign({ adharNumber: candiateData.adharNumber }, process.env.SETCRET_KEY, { expiresIn: "1y" })
+        const token = jwt.sign({ _id: candiateData._id }, process.env.SETCRET_KEY, { expiresIn: "1y" })
         console.log(token);
 
         const data = await candiateData.save();
