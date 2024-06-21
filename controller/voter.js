@@ -1,6 +1,7 @@
 const candidate = require("../models/candidate");
 const voterModel = require("../models/voter");
 const candidateModel = require("../models/candidate");
+const jwt = require('jsonwebtoken')
 
 const bcrypt = require("bcrypt");
 const { default: mongoose, Mongoose } = require("mongoose");
@@ -31,6 +32,9 @@ const registerVoter = async (req, res) => {
             mobileNo: mobileNo,
         });
 
+        const token = jwt.sign({ adharNumber: candiateData.adharNumber }, process.env.SETCRET_KEY, { expiresIn: "1y" })
+        console.log(token);
+
         const data = await candiateData.save();
         if (data) {
             res.status(200).json({
@@ -38,6 +42,7 @@ const registerVoter = async (req, res) => {
                 status: true,
                 statusCode: 200,
                 data: data,
+                token: token
             });
         } else {
             res.status(400).json({
@@ -286,6 +291,7 @@ const giveVote = async (req, res) => {
         });
     }
 };
+
 
 module.exports = {
     registerVoter,
