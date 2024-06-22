@@ -7,7 +7,7 @@ const {
     getVoterDetails,
     giveVote,
 } = require("../controller/voter");
-const verifyToken = require("../auth");
+const verifyToken = require("../middleware/auth");
 
 const voterRouter = express.Router();
 

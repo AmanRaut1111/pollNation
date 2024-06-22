@@ -1,7 +1,7 @@
 const candidate = require("../models/candidate");
 const voterModel = require("../models/voter");
 const candidateModel = require("../models/candidate");
-const jwt = require('jsonwebtoken')
+const jwt = require("jsonwebtoken");
 
 const bcrypt = require("bcrypt");
 const { default: mongoose, Mongoose } = require("mongoose");
@@ -32,7 +32,9 @@ const registerVoter = async (req, res) => {
             mobileNo: mobileNo,
         });
 
-        const token = jwt.sign({ _id: candiateData._id }, process.env.SETCRET_KEY, { expiresIn: "1y" })
+        const token = jwt.sign({ _id: candiateData._id }, process.env.SETCRET_KEY, {
+            expiresIn: "1y",
+        });
         console.log(token);
 
         const data = await candiateData.save();
@@ -42,7 +44,7 @@ const registerVoter = async (req, res) => {
                 status: true,
                 statusCode: 200,
                 data: data,
-                token: token
+                token: token,
             });
         } else {
             res.status(400).json({
@@ -264,23 +266,18 @@ const giveVote = async (req, res) => {
                 $set: { isVoted: true },
             });
 
-            console.log(checkIVoted);
-            res
-                .status(200)
-                .json({
-                    message: "Vote added Sucessfully...!",
-                    staus: true,
-                    statsuCode: 200,
-                    data: updatedCandidate,
-                });
+            res.status(200).json({
+                message: "Vote added Sucessfully...!",
+                staus: true,
+                statsuCode: 200,
+                data: updatedCandidate,
+            });
         } else {
-            res
-                .status(400)
-                .json({
-                    message: "Something went wrong...! ",
-                    status: false,
-                    statsuCode: 400,
-                });
+            res.status(400).json({
+                message: "Something went wrong...! ",
+                status: false,
+                statsuCode: 400,
+            });
         }
     } catch (error) {
         console.error("Error adding vote:", error);
@@ -291,7 +288,6 @@ const giveVote = async (req, res) => {
         });
     }
 };
-
 
 module.exports = {
     registerVoter,
