@@ -78,4 +78,77 @@ const updateCandidate = async (req, res) => {
 
     }
 }
-module.exports = { addCandidate, getAllCandidate, deleteCandidate, updateCandidate }
+const getAllCandidateFromState = async (req, res) => {
+    try {
+
+        const { state, constituency } = req.query
+        if (!state || !constituency) {
+            return res.status(400).json({ message: " Input is Required", status: false, statsuCode: 400 })
+        }
+
+        const data = await candidateModel.aggregate([
+            {
+                '$match': {
+                    'state': state,
+                    'constituency': constituency
+                }
+            }, {
+                '$project': {
+                    'candidateName': 1,
+                    'constituency': 1,
+                    'partyName': 1,
+                    'gender': 1,
+                    'state': 1
+                }
+            }
+        ])
+        if (data) {
+            res.status(200).json({ message: "Data found Sucessfully...!", status: true, statusCode: 200, data: data })
+        } else {
+            res.status(400).json({ message: "Something Went wrong...!", status: true, statusCode: 400 })
+        }
+
+    } catch (error) {
+        console.log(error);
+        res.status(500).json({ message: "Something Went wrong...!", status: true, statusCode: 500 })
+    }
+}
+
+
+const getCandidateWithParty = async (req, res) => {
+    try {
+
+
+        const { state, partyName } = req.query
+
+        if (!state || !partyName) {
+            return res.status(400).json({ message: " Input is Required", status: false, statsuCode: 400 })
+        }
+        const data = await candidateModel.aggregate([
+            {
+                '$match': {
+                    'state': state,
+                    'partyName': partyName
+                }
+            }, {
+                '$project': {
+                    'candidateName': 1,
+                    'partyName': 1,
+                    'state': 1,
+                    'constituency': 1,
+                    'gender': 1
+                }
+            }
+        ])
+        if (data) {
+            res.status(200).json({ message: "Data found Sucessfully...!", status: true, statusCode: 200, data: data })
+        } else {
+            res.status(400).json({ message: "Something Went wrong...!", status: true, statusCode: 400 })
+        }
+
+    } catch (error) {
+        console.log(error);
+        res.status(500).json({ message: "Something Went wrong...!", status: true, statusCode: 500 })
+    }
+}
+module.exports = { addCandidate, getAllCandidate, deleteCandidate, updateCandidate, getAllCandidateFromState, getCandidateWithParty }
