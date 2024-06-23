@@ -8,6 +8,7 @@ const candidateschema = mongoose.Schema({
     age: {
         type: Number,
         required: true,
+        min: [18, 'Age must be at least 18'] // Replace 18 with your minimum age value
     },
     partyName: {
         type: String,
