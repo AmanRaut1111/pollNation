@@ -41,7 +41,7 @@ const candidateschema = mongoose.Schema({
     }],
     winner: {
         type: Boolean,
-        default: "false"
+        default: false
     },
 
     totalVotes: {
