@@ -39,6 +39,10 @@ const candidateschema = mongoose.Schema({
             default: Date.now(),
         },
     }],
+    winner: {
+        type: Boolean,
+        default: "false"
+    },
 
     totalVotes: {
         type: Number,
