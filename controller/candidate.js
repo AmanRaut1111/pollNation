@@ -258,10 +258,13 @@ const countVote = async (req, res) => {
         ]);
         if (voteData) {
             res.status(200).json({
-                message: " Data found  sucessfully ...!",
+                message: " Data Found  sucessfully ...!",
+                status: true,
                 statsuCode: 200,
-                status: 200,
+
+
                 data: voteData,
+                totalCandidate: voteData.length,
             });
         } else {
             res.status(400).json({
