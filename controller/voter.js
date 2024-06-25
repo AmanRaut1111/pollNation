@@ -173,19 +173,27 @@ const updateVoterPassword = async (req, res) => {
 };
 const getVoterDetails = async (req, res) => {
     try {
+        const { serach = '' } = req.query
         const votersData = await voterModel.aggregate([
             {
-                $project: {
-                    voterName: 1,
-                    gender: 1,
-                    age: 1,
-                    state: 1,
-                    constituency: 1,
-                    mobileNo: 1,
-                    isVoted: 1,
-                    createdAt: 1,
-                    updatedAt: 1,
-                },
+                '$match': {
+                    'voterName': {
+                        '$regex': serach,
+                        '$options': 'i'
+                    }
+                }
+            },
+            {
+                '$project': {
+                    'voterName': 1,
+                    'gender': 1,
+                    'age': 1,
+                    'state': 1,
+                    'constituency': 1,
+                    'mobileNo': 1,
+                    'isVoted': 1,
+
+                }
             },
         ]);
         if (votersData) {
