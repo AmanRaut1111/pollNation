@@ -1,5 +1,7 @@
 const express = require("express");
 const db = require('./config/db');
+const session = require('express-session');
+const cookieParser = require('cookie-parser');
 const voterRouter = require("./Routes/voterRouter");
 const adminRouter = require("./Routes/adminRouter");
 const candidateRouter = require("./Routes/candidateRouter");
@@ -8,6 +10,13 @@ require("dotenv").config();
 
 const app = express();
 app.use(express.json())
+app.use(session({
+    secret: 'keyboard cat',
+    resave: false,
+    saveUninitialized: true,
+    cookie: { secure: false } // Use true in production with HTTPS
+}))
+app.use(cookieParser()); // Add this line
 
 
 app.use('/', voterRouter)
