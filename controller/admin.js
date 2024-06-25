@@ -1,5 +1,7 @@
+const jwt = require("jsonwebtoken");
 const adminModel = require("../models/admin");
 const passwordhelper = require("../helpers/password");
+require("dotenv").config();
 
 const registerAdmin = async (req, res) => {
     try {
@@ -10,13 +12,17 @@ const registerAdmin = async (req, res) => {
             password: await passwordhelper.hash(password),
         });
 
-        const data = await adminData.save();
+        const admin = await adminData.save();
+        const token = jwt.sign({ _id: admin._id }, process.env.SETCRET_KEY, {
+            expiresIn: process.env.EXPIRES_IN,
+        });
 
-        if (data) {
+        if (admin) {
             res.status(200).json({
                 message: "Admin Registerd Sucessfully...!",
                 status: true,
                 statusCode: 200,
+                token: token,
             });
         } else {
             res.status(400).json({
@@ -87,9 +93,7 @@ const loginAdmin = async (req, res) => {
 
 const adminLogout = (req, res) => {
     try {
-        console.log("Cookies:", req.cookies); // Log cookies
         if (req.session.adminId) {
-
             req.session.destroy((err) => {
                 if (err) {
                     return res.status(500).json({
@@ -101,13 +105,11 @@ const adminLogout = (req, res) => {
             });
 
             res.clearCookie("connect.sid"); // Clear the session cookie
-            res
-                .status(200)
-                .json({
-                    message: "Logout sucessfully..!",
-                    status: true,
-                    statusCode: 200,
-                });
+            res.status(200).json({
+                message: "Logout sucessfully..!",
+                status: true,
+                statusCode: 200,
+            });
         } else {
             res.status(400).json({
                 message: "No Admin is Logged In.",

@@ -4,11 +4,13 @@ const {
     loginAdmin,
     adminLogout,
 } = require("../controller/admin");
-const adminRouter = express.Router();
 const adminAuthenticated = require("../middleware/adminAuth");
-adminRouter.post("/logout", adminAuthenticated, adminLogout);
+const verifyToken = require("../middleware/auth");
+const adminRouter = express.Router();
+
 
 adminRouter.post("/register", registerAdmin);
-adminRouter.post("/login", loginAdmin);
+adminRouter.post("/login", verifyToken, loginAdmin);
+adminRouter.post("/logout", adminAuthenticated, adminLogout);
 
 module.exports = adminRouter;
