@@ -89,6 +89,7 @@ const adminLogout = (req, res) => {
     try {
         console.log("Cookies:", req.cookies); // Log cookies
         if (req.session.adminId) {
+
             req.session.destroy((err) => {
                 if (err) {
                     return res.status(500).json({
