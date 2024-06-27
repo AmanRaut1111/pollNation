@@ -425,6 +425,25 @@ const winnerFromState = async (req, res) => {
         });
     }
 };
+const updateWinnerStatus = async (req, res) => {
+    const { id } = req.params
+
+
+    const { winner } = req.body
+    try {
+        const updateStatus = await candidateModel.findByIdAndUpdate(id, { $set: { winner: winner } }, { new: true })
+
+        if (updateStatus) {
+            res.status(200).json({ message: 'Status Updated...!', status: true, statssuCode: 200, data: updateStatus })
+        } else {
+            res.status(400).json({ message: "Something went wrong..!", statsuCode: 400, stastus: false })
+        }
+    } catch (error) {
+        console.log(error);
+        res.status(500).json({ message: "Something went wrong...!", status: false, statusCode: 500 })
+
+    }
+}
 
 module.exports = {
     addCandidate,
@@ -436,4 +455,5 @@ module.exports = {
     countVote,
     winnerCandidate,
     winnerFromState,
+    updateWinnerStatus
 };
