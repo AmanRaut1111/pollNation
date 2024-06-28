@@ -1,5 +1,6 @@
-const { mongo } = require("mongoose");
+const { mongo, default: mongoose } = require("mongoose");
 const candidateModel = require("../models/candidate");
+const adminModel = require("../models/admin")
 const addCandidate = async (req, res) => {
     try {
         const { candidateName, age, state, partyName, gender, constituency } =
@@ -426,22 +427,40 @@ const winnerFromState = async (req, res) => {
     }
 };
 const updateWinnerStatus = async (req, res) => {
-    const { id } = req.params
-
-
-    const { winner } = req.body
     try {
-        const updateStatus = await candidateModel.findByIdAndUpdate(id, { $set: { winner: winner } }, { new: true })
+        const { id, adminId } = req.params;
+        const { winner } = req.body;
+
+        // Validate adminId
+        if (!mongoose.Types.ObjectId.isValid(adminId)) {
+            return res.status(400).json({ message: "Invalid admin ID", status: false, statusCode: 400 });
+        }
+
+        const adminData = await adminModel.findById(new mongoose.Types.ObjectId(adminId));
+
+        if (!adminData) {
+            return res.status(401).json({ message: "Admin not found", status: false, statusCode: 401 });
+        }
+
+        if (adminData.role !== 'admin') {
+            return res.status(401).json({ message: "You are not authorized", status: false, statusCode: 401 });
+        }
+
+        // Validate candidate ID
+        if (!mongoose.Types.ObjectId.isValid(id)) {
+            return res.status(400).json({ message: "Invalid candidate ID", status: false, statusCode: 400 });
+        }
+
+        const updateStatus = await candidateModel.findByIdAndUpdate(id, { $set: { winner: winner } }, { new: true });
 
         if (updateStatus) {
-            res.status(200).json({ message: 'Status Updated...!', status: true, statssuCode: 200, data: updateStatus })
+            res.status(200).json({ message: 'Status Updated...!', status: true, statusCode: 200, data: updateStatus });
         } else {
-            res.status(400).json({ message: "Something went wrong..!", statsuCode: 400, stastus: false })
+            res.status(400).json({ message: "Something went wrong..!", statusCode: 400, status: false });
         }
     } catch (error) {
         console.log(error);
-        res.status(500).json({ message: "Something went wrong...!", status: false, statusCode: 500 })
-
+        res.status(500).json({ message: "Something went wrong...!", status: false, statusCode: 500 });
     }
 }
 
