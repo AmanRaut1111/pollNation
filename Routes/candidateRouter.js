@@ -11,6 +11,7 @@ const {
     winnerFromState,
     updateWinnerStatus,
 } = require("../controller/candidate");
+const verifyToken = require("../middleware/auth");
 const candidateRouter = express.Router();
 
 candidateRouter.post("/add", addCandidate);
@@ -22,6 +23,6 @@ candidateRouter.get("/fromParty", getCandidateWithParty);
 candidateRouter.get("/countVote", countVote);
 candidateRouter.get("/winnerCandidate", winnerCandidate);
 candidateRouter.get("/winnerFromstate", winnerFromState);
-candidateRouter.patch("/updatestatus/:id", updateWinnerStatus);
+candidateRouter.patch("/updatestatus/:id/:adminId", verifyToken, updateWinnerStatus);
 
 module.exports = candidateRouter;
